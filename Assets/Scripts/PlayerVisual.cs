@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class PlayerVisual : MonoBehaviour
 {
-    private Vector2 playerMoveDirection;
     private SpriteRenderer spriteRenderer;
     private Animator animator;
+    private PlayerController _playerController;
 
     private const string IS_RUNNING = "IsRunning";
     private const string IS_JUMPING = "IsJumping";
@@ -15,29 +15,36 @@ public class PlayerVisual : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
+    private void Start()
+    {
+        _playerController = PlayerController.Instance;
+    }
+
     private void Update()
     {
-        playerMoveDirection = Player.Instance.GetMovementDirection();
-
         FlipPlayerSprite();
         HandleMovementAnimation();
+        HandleJumpAnimation();
     }
 
     private void FlipPlayerSprite()
     {
-        if (playerMoveDirection.x < 0)
+        if (_playerController.GetMoveDirection().x < 0)
             spriteRenderer.flipX = true;
-        else if (playerMoveDirection.x > 0)
+        else if (_playerController.GetMoveDirection().x > 0)
             spriteRenderer.flipX = false;
-        else
-            spriteRenderer.flipX = spriteRenderer.flipX;
     }
 
     private void HandleMovementAnimation()
     {
-        if (Mathf.Abs(playerMoveDirection.x) > 0)
+        if (Mathf.Abs(_playerController.GetMoveDirection().x) > 0)
             animator.SetBool(IS_RUNNING, true);
         else
             animator.SetBool(IS_RUNNING, false);
+    }
+
+    private void HandleJumpAnimation()
+    {
+        animator.SetBool(IS_JUMPING, !_playerController.GetIsGrounded());
     }
 }
